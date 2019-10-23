@@ -7,6 +7,7 @@ so编写示例、JNI示例
 ## 步骤：
 ### 第一步：在AndroidStudio中配置ndk
 ### 第二步：编写JNI接口类
+```Java
 package com.blue.testso;
 
 public class MyJNI {
@@ -19,10 +20,24 @@ public class MyJNI {
     public static native int add(int a, int b);
 
 }
-
+```
 ### 第三步：在JNI接口类文件路径，生成 .class文件
 1.手动cmd命令生成法
+```cmd
+D:\git\TestSo\app\src\main\java\com\blue\testso>start .
 
+D:\git\TestSo\app\src\main\java\com\blue\testso>javac -encoding utf-8 MyJNI.java
+
+D:\git\TestSo\app\src\main\java\com\blue\testso>cd ..
+
+D:\git\TestSo\app\src\main\java\com\blue>cd ..
+
+D:\git\TestSo\app\src\main\java\com>cd ..
+
+D:\git\TestSo\app\src\main\java>javah -jni com.blue.testso.MyJNI
+
+D:\git\TestSo\app\src\main\java>
+```
 
 
 (2.build自动生成法：(来源于引用2)
@@ -34,13 +49,14 @@ D:\git\TestSo\app\build\intermediates\javac\debug\classes\com\blue\testso\MyJNI.
   
 (或者用文章2方法：
 1.打开Terminal，然后在命令行中先进入到工程的main目录下 cd app/src/main。 
-2.输入命令： javah -d jni -classpath D:\git\TestSo\app\build\intermediates\javac\debug\classes com.blue.testso.MyJNI（注意classes后的空格）)
-
+2.输入命令： 
+```cmd
+javah -d jni -classpath D:\git\TestSo\app\build\intermediates\javac\debug\classes com.blue.testso.MyJNI（注意classes后的空格）)
+```
 ### 第五步：编写c文件
 创建 jni 文件夹，并将.h文件移动到此文件夹下。
 然后创建一个空的c文件，并对其编写。编写内容：将.h文件中 两个方法相关的代码复制到c文件中，头部引用.h文件
-
-
+```c
 #include "com_blue_testso_MyJNI.h"
 /*
  * Class:     com_blue_testso_MyJNI
@@ -63,9 +79,10 @@ JNIEXPORT jint JNICALL Java_com_blue_testso_MyJNI_add(JNIEnv *, jclass, jint a, 
 {
     return a + b;
 }
-
+```
 ### 第六步：下载CMake和LLDB。(需要注意：CMake 不可下载 3.10.版本 需要下载3.6.版本，不然会报错，具体 查看/下载 ‘点击AS-SDKManager - 右下角 showPackageDetails -查看CMake’)
 ### 第七步：下载好后 在项目app下的build.gradle下进行相关配置
+```groove
 apply plugin: 'com.android.application'
 
 android {
@@ -112,8 +129,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
-
-
+```
 ### 第八步：修改 CMakeLists.txt 内容。
 添加CMakeLists.txt文件到app目录下，和build.gradle文件同级目录， 
 关于 CMakeLists.txt 如何得来的，可以自己在新建项目的时候 勾选“Include c/c++” 生成的项目就有此文件。
@@ -124,12 +140,13 @@ dependencies {
 
 ### 第十步：项目创建jniLibs并调用so库方法
 如果想指定jniLibs文件路径可以在app - build.gradle 下配置：
+```groove
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
         }
     }
-
+```
 
 #### 最后需要注意：
 .h文件要移动到 jni文件夹下（如果用参考文章2，可不用）
